@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Knowledge Mock Exam</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-lighter: #c4b5fd;
+            --bg: #f5f3ff;
+            --card: #ffffff;
+            --text: #1e1b4b;
+            --text-secondary: #6b7280;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: #e5e7eb;
+            --shadow: rgba(124, 58, 237, 0.1);
+        }
+
+        body.dark-mode {
+            --bg: #110e2c;
+            --card: #1e1b4b;
+            --text: #f5f3ff;
+            --text-secondary: #a78bfa;
+            --primary: #a78bfa;
+            --primary-light: #c4b5fd;
+            --primary-lighter: #2d2a5e;
+            --border: #312e81;
+            --success: #34d399;
+            --error: #f87171;
+            --shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px var(--shadow), 0 8px 10px -6px var(--shadow);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-lighter);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        #dark-mode-toggle:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: var(--primary-lighter);
+            cursor: not-allowed;
+            transform: none;
+            color: var(--text-secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+            color: var(--primary-light);
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Start Screen */
+        #start-screen {
+            text-align: center;
+        }
+
+        /* Quiz Screen */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: var(--primary-lighter);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-light);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text);
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .choice-btn {
+            width: 100%;
+            text-align: left;
+            background: var(--bg);
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--primary-lighter);
+            background: var(--card);
+        }
+
+        .choice-btn.selected {
+            border-color: var(--primary);
+            background: var(--card);
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .choice-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-lighter);
+            color: var(--primary);
+            font-weight: 700;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .choice-btn.selected .choice-letter {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        /* Result Screen */
+        .result-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, var(--primary-lighter) 0%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .result-circle-inner {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: var(--card);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-text {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .score-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .results-summary {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .wrong-items-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .wrong-item {
+            background: var(--bg);
+            border-left: 4px solid var(--error);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .wrong-item-header {
+            font-weight: 700;
+            color: var(--error);
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .wrong-item p {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .correct-answer-text {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .your-answer-text {
+            color: var(--error);
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            #app { padding: 20px; }
+            .question-text { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+        <h1>Product Knowledge Exam</h1>
+        <p>Set A - 100 Items</p>
+        <p style="color: var(--text-secondary);">Questions and choices are shuffled every time. You will see your score and the items you missed at the end.</p>
+        <button class="btn" onclick="startExam()">Start Exam</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="question-header">
+            <span id="question-number">Question 1 of 100</span>
+            <span id="answered-count">0 / 100 Answered</span>
+        </div>
+        <div class="question-text" id="question-text"></div>
+        <div class="choices-container" id="choices-container"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+            <button class="btn" id="next-btn" onclick="nextQuestion()">Next</button>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="screen">
+        <h2 style="text-align: center;">Exam Finished!</h2>
+        <div class="result-circle" id="result-circle">
+            <div class="result-circle-inner">
+                <span class="score-text" id="score-text">0%</span>
+                <span class="score-label">Score</span>
+            </div>
+        </div>
+        <div class="results-summary">
+            <p><strong>Total Items:</strong> 100</p>
+            <p><strong style="color: var(--success);">Correct:</strong> <span id="correct-count">0</span></p>
+            <p><strong style="color: var(--error);">Incorrect:</strong> <span id="incorrect-count">0</span></p>
+        </div>
+        
+        <div id="wrong-items-list" class="wrong-items-container"></div>
+
+        <div style="text-align: center;">
+            <button class="btn" onclick="startExam()">Retake Exam</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load Dark Mode Preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('dark-mode-toggle').textContent = '☀️';
+    }
+
+    function toggleDarkMode() {
+        const body = document.body;
+        const isDark = body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        document.getElementById('dark-mode-toggle').textContent = isDark ? '☀️' : '🌙';
+    }
+
+    const rawText = `1. What is the main benefit of Yukadanbou (floor heating) mentioned in the document?
+A. It uses less water.
+B. It can be installed quickly.
+C. It warms the entire house, covering almost 100% of the living space.
+D. It is a new technology.
+2. What type of heating does an air conditioner use, according to the document?
+A. Radiant heat
+B. Convection-type
+C. Hydronic
+D. Solar energy
+3. What is the secret of Yukadanbou's warmth?
+A. It uses electricity efficiently.
+B. It works with air conditioning.
+C. It uses radiant heat (far-infrared heating).
+D. It blows warm air.
+4. How does Yukadanbou's heating differ from an air conditioner's heating regarding temperature?
+A. Yukadanbou makes the room hotter.
+B. Yukadanbou makes the floor colder.
+C. Yukadanbou doesn't create vertical temperature differences.
+D. Yukadanbou only heats the ceiling.
+5. What is the floor surface temperature of Ichijo's whole-house Yukadanbou?
+A. About 30-35°C
+B. About 25-28°C
+C. About 20-22°C
+D. About 15-18°C
+6. According to the document, why is Yukadanbou considered safer than combustion heaters?
+A. It is more energy-efficient.
+B. It can be controlled by a remote.
+C. There is no source of fire and nothing to knock over.
+D. It can also cool the room.
+7. How does Yukadanbou help with allergies?
+A. It purifies the air.
+B. It has special filters.
+C. It uses UV light to kill bacteria.
+D. It generates no wind, so it doesn't stir up dust and pollen.
+8. What is the ideal indoor temperature difference recommended for good health?
+A. Within 5-7°C
+B. Within 10°C
+C. Within 2-3C
+D. It is not mentioned.
+9. What is a major health risk associated with sudden temperature differences in a house?
+A. Air Conditioner Sickness
+B. Allergies
+C. Heat shock
+D. Low-temperature burns
+10. In Japan, more people are said to die from heat shock than from what?
+A. Earthquakes
+B. Traffic accidents
+C. Natural disasters
+D. Influenza
+11. What is "Air Conditioner Sickness" caused by?
+A. Too much warm air.
+B. Poor air circulation.
+C. A sharp difference between indoor and outdoor temperatures.
+D. Insufficient humidity.
+12. The energy efficiency of Yukadanbou is achieved through a three-pronged approach: high airtightness, high insulation, and what else?
+A. Solar panels
+B. In-house production
+C. Heat-exchange ventilation
+D. Use of renewable energy
+13. What is the Q-value used to express?
+A. Air circulation efficiency.
+B. The cost of a house.
+C. Insulation performance.
+D. The amount of humidity.
+14. What is the Q-value of Ichijo homes?
+A. 2.7
+B. 1.5
+C. 0.51
+D. 0.73
+15. What is the material of the pipes used in Ichijo's Whole-House Yukadanbou?
+A. Copper
+B. Cross-linked polyethylene (PEX)
+C. PVC
+D. Steel
+16. What is the inner diameter of the pipes used in Ichijo's Yukadanbou system?
+A. 7mm
+B. 12mm
+C. 5mm
+D. 10mm
+17. What is the benefit of Ichijo using thicker pipes for the Yukadanbou system?
+A. The hot water cools more slowly.
+B. The installation is cheaper.
+C. The pipes are more durable.
+D. They are easier to install.
+18. What is the U-value of Ichijo's windows?
+A. 4.65
+B. 2.33
+C. 0.73
+D. 0.51
+19. In a house, what is the primary point of heat exchange?
+A. Walls
+B. Windows
+C. Floors
+D. Doors
+20. Compared to aluminum, how much better does a high-performance resin window frame block heat?
+A. About 10 times better
+B. About 100 times better
+C. About 1,000 times better
+D. About 10,000 times better
+21. What gas is used in the space between the glass panes of Ichijo's windows to reduce thermal transmittance?
+A. Nitrogen
+B. Oxygen
+C. Argon
+D. Helium
+22. What is the thermal conductivity of argon gas compared to dry air?
+A. Approximately 2 times better
+B. Approximately 1.5 times better
+C. Approximately 3 times better
+D. Approximately 2.5 times better
+23. What is the strength of tempered glass compared to standard glass in Ichijo's windows?
+A. About 3.5 times stronger
+B. About 5 times stronger
+C. Over 7 times stronger
+D. Over 10 times stronger
+24. What is the highest watertightness rating achieved by Ichijo's high-performance resin window frames?
+A. W-1
+B. W-3
+C. W-4
+D. W-5
+25. What percentage of harmful UV rays do Ichijo's windows block?
+A. 50%
+B. 75%
+C. 99%
+D. 100%
+26. What is the highest soundproofing performance rating for Ichijo's windows?
+A. Grade 1
+B. Grade 2
+C. Grade 3
+D. Grade 4
+27. What is Ichijo's standard ventilation system called?
+A. Lossguard 90
+B. Air-exchanger 80
+C. Fresh-Air 100
+D. Ventilator Pro
+28. What is the thermal exchange efficiency of Lossguard 90?
+A. Up to 80%
+B. Up to 90%
+C. Up to 95%
+D. Up to 100%
+29. How does heat exchange ventilation work?
+A. It discards indoor heat and brings in outside air.
+B. It brings in fresh outside air close to room temperature by reusing the indoor air's temperature.
+C. It uses a fan to blow warm air around.
+D. It only works with air conditioning.
+30. What function does Lossguard 90 have in addition to temperature exchange?
+A. Air purification
+B. Dust filtration
+C. Humidity exchange
+D. Dehumidification
+31. What is the pollen removal rate of the high-performance filter in Lossguard 90?
+A. 75%
+B. 90%
+C. 99%
+D. 100%
+32. The operating noise of the Lossguard 90 URUKEA is approximately how many decibels (dB)?
+A. 50 dB
+B. 45 dB
+C. 36 dB
+D. 20 dB
+33. What is a key advantage of Ichijo's in-house production of the Yukadanbou system?
+A. It requires less material.
+B. It enables low-cost installation.
+C. It makes the pipes more durable.
+D. It allows for a single-stroke layout.
+34. What is the main enemy of insulation materials?
+A. Temperature
+B. Moisture
+C. Dust
+D. Sunlight
+35. What is the primary function of the Header Box?
+A. To control the boiler.
+B. To keep the room at the desired temperature.
+C. To supply water.
+D. To connect the air conditioner.
+36. How is the Yukadanbou piping installed to reduce the risk of leaks?
+A. With extra-strong joints.
+B. By welding the pipes together.
+C. In a seamless "single-stroke" layout with fewer joints.
+D. Using special glue.
+37. What type of insulation material does Ichijo use?
+A. Glass wool
+B. Rock wool
+C. High-Performance Rigid Polyurethane Foam
+D. Fiberglass
+38. Compared to conventional glass wool, Ichijo's insulation material has about how much more performance?
+A. Same performance
+B. 1.5 times the performance
+C. Twice the performance
+D. 3 times the performance
+39. What is the thickness of the exterior layer of High-Performance Rigid Polyurethane Foam in the double insulation method?
+A. 140 mm
+B. 100 mm
+C. 50 mm
+D. 20 mm
+40. What is the thickness of the interior layer of High-Performance Rigid Polyurethane Foam?
+A. 50 mm
+B. 140 mm
+C. 100 mm
+D. 20 mm
+41. What is the heat-conductive rate of Ichijo's Outside Wall (Double Insulation Method)?
+A. 0.53 W/m2K
+B. 0.35 W/m2K
+C. 0.2 W/m2K
+D. 0.73 W/m2K
+42. How much less heat-conductive is Ichijo's wall structure compared to Japan's Next-Generation Energy-Saving Standards?
+A. More than 2.5 times
+B. More than 5 times
+C. More than 10 times
+D. It's about the same
+43. What is the name of the central heat exchange ventilation system used by Ichijo?
+A. Air-Pro 90
+B. Eco-Vent 80
+C. Lossguard 90
+D. Temp-Saver 95
+44. What does the term "thermal exchange" mean in the context of the ventilation system?
+A. Ventilating a room without changing the air.
+B. Ventilating a room and discarding indoor heat.
+C. Ventilating a room while reusing the comfortable temperature.
+D. Ventilating a room and discarding humidity.
+45. The document compares an Ichijo house to what?
+A. An oven
+B. A refrigerator
+C. A cave
+D. A thermos bottle
+46. What is a "convection-type" heating system?
+A. A system that uses solar energy.
+B. A system that circulates water.
+C. A system that uses radiant heat.
+D. A system that heats only the areas that come into contact with warm air.
+47. In a house with Yukadanbou, what is the temperature like near the floor for a baby?
+A. Cold, as the air sinks.
+B. The same as an air-conditioned room.
+C. Warm and comfortable.
+D. Very hot.
+48. What is a major risk of low-temperature burns?
+A. It can happen at any temperature.
+B. It can occur when a surface is significantly hotter than the body.
+C. There is no concern for low-temperature burns with Ichijo's Yukadanbou.
+D. It is common with air conditioners.
+49. How does Yukadanbou reduce condensation?
+A. By increasing the temperature.
+B. By minimizing temperature differences and not overheating the room.
+C. By adding a dehumidifier.
+D. By blowing dry air.
+50. What is a consequence of condensation mentioned in the document?
+A. It increases energy bills.
+B. It makes the air stale.
+C. It can lead to the growth of mold and mites.
+D. It corrodes the pipes.
+51. What is the main reason for the affordable operation of whole-house Yukadanbou?
+A. High energy efficiency.
+B. Low installation costs.
+C. Government subsidies.
+D. Simple design.
+52. In a house with low insulation, what happens to the heat from heating?
+A. It is retained.
+B. It escapes outside, warming the exterior walls.
+C. It stays near the floor.
+D. It is evenly distributed.
+53. What is the relationship between the Q-value and heating costs?
+A. They are inversely proportional.
+B. They are directly proportional.
+C. There is no relationship.
+D. The document doesn't mention this.
+54. The document mentions that Ichijo's homes are top-class in energy savings because of their Q-value of what?
+A. 2.7
+B. 0.51
+C. 0.73
+D. 1.0
+55. How long have the pipes used in Ichijo's whole-house Yukadanbou been durability-tested to last?
+A. 10 years
+B. Over 50 years
+C. 20 years
+D. 30 years
+56. What material makes the Yukadanbou pipes resistant to heat and impact?
+A. PVC
+B. Cross-linked polyethylene (PEX)
+C. Copper
+D. Steel
+57. Why do many other companies recommend installing floor heating only in the living room?
+A. Because installation costs are high.
+B. Because it's not effective in other rooms.
+C. Because it's a new technology.
+D. Because they don't have the materials.
+58. What is a consequence of having temperature gaps between rooms?
+A. Low-temperature burns.
+B. Increased energy savings.
+C. Increased risk of heat shock.
+D. Reduced humidity.
+59. What is the main advantage of the "single-stroke" layout of the Yukadanbou piping?
+A. It uses more pipe.
+B. It is easier to fix.
+C. It requires more joints.
+D. It reduces the risk of hot water leaks and dust intrusion.
+60. What is the "Double Insulation Method"?
+A. Using two layers of glass in the windows.
+B. Layering high-performance insulation on both the outside and inside of the structural frame.
+C. Using a combination of air and water for heating.
+D. Installing two separate heating systems.
+61. How does the "Double Insulation Method" help with energy saving in summer?
+A. It blocks sunlight and heat.
+B. It generates cold air.
+C. It increases humidity.
+D. It reduces air pressure.
+62. What is the main material used for the walls, ceilings, and floors in an Ichijo house?
+A. Glass wool
+B. Rock wool
+C. High-Performance Rigid Polyurethane Foam
+D. Standard glass
+63. What is the moisture permeability rate of Ichijo's high-performance urethane foam?
+A. 170
+B. 50
+C. 1.4
+D. 0.51
+64. What is the main problem with fiber-based insulation materials like glass wool?
+A. They are too heavy.
+B. They are difficult to install.
+C. They can absorb moisture and lose insulation performance.
+D. They are too expensive.
+65. What percentage of incoming heat enters through the windows in summer?
+A. 58%
+B. 11%
+C. 6%
+D. 73%
+66. What percentage of warm air escapes through the windows in winter?
+A. 73%
+B. 15%
+C. 58%
+D. 5%
+67. What is the material used for Ichijo's window frames?
+A. Aluminum
+B. Wood
+C. Steel
+D. Resin
+68. What is the thermal resistance value for aluminum frames?
+A. 200
+B. 0.17
+C. 0.73
+D. 0.51
+69. What is the thermal resistance value for resin frames?
+A. 0.17
+B. 200
+C. 0.73
+D. 0.51
+70. What is the thermal transmittance of commonly used dry air?
+A. 0.016 W/mK
+B. 0.024 W/mK
+C. 0.050 W/mK
+D. 0.100 W/mK
+71. What is the thermal transmittance of argon gas?
+A. 0.024 W/mK
+B. 0.050 W/mK
+C. 0.016 W/mK
+D. 0.100 W/mK
+72. Compared to a standard window, Ichijo's windows have approximately how many times the insulation performance?
+A. Two times
+B. Three times
+C. Six times
+D. Eight times
+73. What is the thickness of the tempered glass used in Ichijo's windows?
+A. 3mm
+B. 5mm
+C. 7mm
+D. 10mm
+74. What is the wind pressure resistance of tempered glass compared to standard glass?
+A. Over 7 times
+B. Approximately 3.5 times
+C. Over 10 times
+D. It's the same
+75. What is the soundproofing performance rating for Ichijo's windows?
+A. Grade 1
+B. Grade 2
+C. Grade 3
+D. Grade 4
+76. What is the main purpose of the "Lossguard 90" system?
+A. To heat the house.
+B. To provide stable ventilation.
+C. To humidify the house.
+D. To cool the house.
+77. Which type of ventilation system is the Lossguard 90?
+A. Type 2
+B. Type 1
+C. Type 3
+D. Type 4
+78. What does "thermal exchange efficiency" indicate?
+A. The cost of the ventilation system.
+B. The speed of air circulation.
+C. The recovery rate of the comfortable temperature.
+D. The amount of humidity removed.
+79. The Lossguard 90 is described as having the world's highest level of thermal exchange efficiency, which is up to what percentage?
+A. 80%
+B. 90%
+C. 95%
+D. 100%
+80. What is the main function of the "humidity exchange" feature of Lossguard 90?
+A. It adds moisture to the incoming air.
+B. It discharges moisture from the incoming air.
+C. It only works in winter.
+D. It measures the humidity level.
+81. Why can a high-performance filter be attached to the Lossguard 90 without hindering ventilation?
+A. Because it has a weak air intake.
+B. Because it has powerful ventilation.
+C. Because the filter is very thin.
+D. Because it is a small unit.
+82. What is the sound level of the Lossguard 90 URUKEA system?
+A. As loud as a vacuum cleaner.
+B. As quiet as a library.
+C. As loud as a running car.
+D. It's silent.
+83. What does "Tsuyu" refer to in Japan?
+A. The summer season.
+B. The typhoon season.
+C. The rainy season.
+D. The winter season.
+84. What is the key element that most affects a house's insulation performance?
+A. The ceiling.
+B. The floor.
+C. The windows.
+D. The walls.
+85. Why are Ichijo's resin window frames highly resistant to condensation?
+A. Because they have industry-leading insulation performance.
+B. Because they are filled with argon gas.
+C. Because they are made of tempered glass.
+D. Because they have a "W-5" rating.
+86. What is the main purpose of the "Reibaikan" pipe?
+A. To circulate warm water.
+B. To provide water to the boiler.
+C. It's an air conditioner refrigerant pipe.
+D. To supply cold water to the Yukadanbou.
+87. What is the main function of the "Shitugaiki (boiler)"?
+A. To control the water circulation.
+B. To make hot water for Yukadanbou.
+C. To provide fresh air.
+D. To cool the room.
+88. According to the document, where is tempered glass widely used?
+A. Public facilities like schools and airports.
+B. Residential homes only.
+C. High-rise buildings.
+D. Industrial buildings.
+89. Why is it important to improve the thermal insulation performance of windows?
+A. To make them stronger.
+B. To reduce outside noise.
+C. To maintain a comfortable indoor temperature.
+D. To block out sunlight.
+90. What is a consequence of having many gaps and low insulation in a house?
+A. Lower electricity bills.
+B. Higher electricity bills.
+C. Reduced humidity.
+D. Lower risk of heat shock.
+91. What happens to the heat when it escapes outside from a house with low insulation?
+A. It warms the exterior walls.
+B. It disappears.
+C. It is absorbed by the ground.
+D. It cools the exterior walls.
+92. What are the two types of insulation mentioned in the document?
+A. Fiberglass and rock wool.
+B. Rock wool and high-performance urethane foam.
+C. Glass wool and high-performance urethane foam.
+D. Fiberglass and high-performance urethane foam.
+93. What is the main purpose of the "heat exchange ventilation system"?
+A. To only bring in fresh air.
+B. To only expel stale air.
+C. To ventilate without significant heat loss.
+D. To cool the house.
+94. What is a "convection-type" heating system compared to radiant heat?
+A. Convection-type heats from the feet up.
+B. Convection-type only heats areas in contact with warm air.
+C. Convection-type warms the entire room evenly.
+D. Convection-type is more energy-efficient.
+95. What does the "Double Insulation Method (Exterior & Interior)" achieve?
+A. Performance that far surpasses ordinary insulation methods.
+B. Performance that is slightly better than ordinary insulation.
+C. Performance that is comparable to other methods.
+D. Performance that is not mentioned.
+96. How is the Yukadanbou system made for each home?
+A. It is a one-size-fits-all system.
+B. It is custom-made for each home layout.
+C. It is a modular system.
+D. It is a generic system.
+97. What is the main advantage of the "Single-stroke" layout?
+A. It is easier to fix.
+B. Fewer joints, lower maintenance and cost.
+C. It can be installed by anyone.
+D. It requires less material.
+98. The document mentions that Ichijo's windows have insulation performance that meets or exceeds the standards of what country?
+A. The United States
+B. Germany
+C. Japan
+D. China
+99. What does the "watertightness" rating indicate?
+A. Water resistance.
+B. Insulation performance.
+C. Wind pressure resistance.
+D. Soundproofing.
+100. What is one of the functions of Ichijo's glass?
+A. To block 99% of harmful UV rays.
+B. To generate solar power.
+C. To change colors based on temperature.
+D. To reflect sound.`;
+
+    const rawKey = `1. C 51. A
+2. B 52. B
+3.C 53. E
+4. C 54. B
+5. E 55. E
+6. C 56. B
+7. D 57.A
+8.C 58. C
+9. C 59. D
+10. B 60. B
+11.C 61. A
+12. C 62. C
+13. C 63. C
+14. C 64. C
+15. B 65. D
+16. D 66. C
+17.A 67. D
+18. C 68. A
+19. B 69. A
+20. C 70. E
+21. C 71.C
+22. B 72. C
+23. C 73. E
+24. D 74. B
+25.C 75. C
+26. C 76. B
+27.A 77. B
+28. B 78.C
+29. B 79. E
+30. C 80. E
+31. C 81. B
+32. C 82. B
+33. B 83. C
+34. B 84. C
+35. B 85. A
+36. C 86. C
+37.C 87. B
+38. C 88. A
+39. C 89. C
+40. B 90. E
+41. C 91. A
+42. A 92.C
+43. C 93. C
+44. C 94. B
+45. D 95. A
+46. D 96. B
+47.C 97. B
+48. C 98. B
+49. B 99. A
+50. C 100.A`;
+
+    let questions = [];
+    let userAnswers = [];
+    let currentIndex = 0;
+
+    function parseData() {
+        questions = []; // Reset array to prevent duplicates
+        const lines = rawText.split('\n');
+        let currentQ = null;
+        let currentChoiceLabel = null;
+
+        lines.forEach(line => {
+            const qMatch = line.match(/^(\d+)\.\s+(.*)/);
+            const cMatch = line.match(/^([A-D])\.\s+(.*)/);
+
+            if (qMatch) {
+                if (currentQ) questions.push(currentQ);
+                currentQ = {
+                    id: parseInt(qMatch[1]),
+                    text: qMatch[2].trim(),
+                    choices: [],
+                    correctText: ''
+                };
+                currentChoiceLabel = null;
+            } else if (cMatch && currentQ) {
+                currentChoiceLabel = cMatch[1];
+                currentQ.choices.push({
+                    label: currentChoiceLabel,
+                    text: cMatch[2].trim()
+                });
+            } else if (currentQ && line.trim() !== '') {
+                // Multi-line append
+                if (currentChoiceLabel) {
+                    const lastChoice = currentQ.choices[currentQ.choices.length - 1];
+                    lastChoice.text += ' ' + line.trim();
+                } else {
+                    currentQ.text += ' ' + line.trim();
+                }
+            }
+        });
+
+        if (currentQ) questions.push(currentQ);
+
+        // Parse Answer Key
+        const keyLines = rawKey.split('\n');
+        const answerMap = {};
+        
+        keyLines.forEach(line => {
+            const pairs = line.trim().split(/\s+/);
+            for(let i=0; i < pairs.length; i+=2) {
+                const id = parseInt(pairs[i]);
+                const ans = pairs[i+1];
+                if(!isNaN(id) && ans) {
+                    answerMap[id] = ans;
+                }
+            }
+        });
+
+        // Assign correct text to questions
+        questions.forEach(q => {
+            let correctLabel = answerMap[q.id];
+            
+            // Fix anomaly where key says 'E' but options only go up to 'D'
+            // Based on user instruction, 'E' is supposedly 'B'
+            if (correctLabel === 'E') {
+                correctLabel = 'B';
+            }
+
+            const correctChoice = q.choices.find(c => c.label === correctLabel);
+            if (correctChoice) {
+                q.correctText = correctChoice.text;
+            }
+        });
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function startExam() {
+        parseData();
+        shuffleArray(questions);
+        userAnswers = new Array(questions.length).fill(null);
+        currentIndex = 0;
+        
+        // Shuffle choices within each question
+        questions.forEach(q => shuffleArray(q.choices));
+        
+        showScreen('quiz-screen');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentIndex];
+        
+        document.getElementById('question-number').textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+        document.getElementById('answered-count').textContent = `${userAnswers.filter(a => a !== null).length} / ${questions.length} Answered`;
+        
+        const progress = ((currentIndex + 1) / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        document.getElementById('question-text').textContent = `${currentIndex + 1}. ${q.text}`;
+
+        const container = document.getElementById('choices-container');
+        container.innerHTML = '';
+
+        const letters = ['A', 'B', 'C', 'D'];
+        q.choices.forEach((choice, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            if (userAnswers[currentIndex] === choice.text) {
+                btn.classList.add('selected');
+            }
+            btn.innerHTML = `<span class="choice-letter">${letters[index]}</span><span>${choice.text}</span>`;
+            btn.onclick = () => selectAnswer(choice.text);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('prev-btn').disabled = currentIndex === 0;
+        
+        const nextBtn = document.getElementById('next-btn');
+        if (currentIndex === questions.length - 1) {
+            nextBtn.textContent = 'Finish Exam';
+        } else {
+            nextBtn.textContent = 'Next';
+        }
+    }
+
+    function selectAnswer(answerText) {
+        userAnswers[currentIndex] = answerText;
+        renderQuestion();
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if (userAnswers[currentIndex] === null) {
+            alert("Please select an answer before proceeding.");
+            return;
+        }
+
+        if (currentIndex < questions.length - 1) {
+            currentIndex++;
+            renderQuestion();
+        } else {
+            finishExam();
+        }
+    }
+
+    function finishExam() {
+        let correctCount = 0;
+        const wrongItems = [];
+
+        questions.forEach((q, index) => {
+            if (userAnswers[index] === q.correctText) {
+                correctCount++;
+            } else {
+                wrongItems.push({
+                    id: index + 1,
+                    question: q.text,
+                    userAnswer: userAnswers[index],
+                    correctAnswer: q.correctText
+                });
+            }
+        });
+
+        const score = Math.round((correctCount / questions.length) * 100);
+        
+        document.getElementById('score-text').textContent = `${score}%`;
+        document.getElementById('correct-count').textContent = correctCount;
+        document.getElementById('incorrect-count').textContent = questions.length - correctCount;
+
+        const circle = document.getElementById('result-circle');
+        circle.style.background = `conic-gradient(var(--primary) ${score}%, var(--primary-lighter) ${score}%)`;
+
+        const wrongList = document.getElementById('wrong-items-list');
+        wrongList.innerHTML = '';
+
+        if (wrongItems.length > 0) {
+            const header = document.createElement('h3');
+            header.textContent = 'Missed Items';
+            header.style.color = 'var(--error)';
+            header.style.textAlign = 'left';
+            header.style.marginBottom = '15px';
+            wrongList.appendChild(header);
+
+            wrongItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'wrong-item';
+                div.innerHTML = `
+                    <div class="wrong-item-header">Question ${item.id}</div>
+                    <p>${item.question}</p>
+                    <p class="your-answer-text">Your Answer: ${item.userAnswer || 'Unanswered'}</p>
+                    <p class="correct-answer-text">Correct Answer: ${item.correctAnswer}</p>
+                `;
+                wrongList.appendChild(div);
+            });
+        } else {
+            wrongList.innerHTML = '<p style="text-align: center; color: var(--success); font-weight: bold;">Perfect Score! Congratulations!</p>';
+        }
+
+        showScreen('result-screen');
+    }
+
+</script>
+</body>
+</html>
